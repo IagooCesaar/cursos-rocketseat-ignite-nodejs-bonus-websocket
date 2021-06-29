@@ -8,7 +8,7 @@ const server = createServer(app);
 const io = new Server(server);
 
 io.on("connection", (socket) => {
-  console.log("soket", socket)
+  console.log("soket", socket.id)
 })
 
 app.use(express.static(path.join(__dirname,"..", "public")))
