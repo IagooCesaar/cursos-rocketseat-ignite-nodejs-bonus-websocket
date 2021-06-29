@@ -7,6 +7,10 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+io.on("connection", (socket) => {
+  console.log("soket", socket)
+})
+
 app.use(express.static(path.join(__dirname,"..", "public")))
 
 app.get('/', (req, res) => {
