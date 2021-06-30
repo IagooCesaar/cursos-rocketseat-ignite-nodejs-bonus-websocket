@@ -9,14 +9,15 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-mongoose.connect("mongodb://localhost/rocketsocket", {
+//mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
+mongoose.connect("mongodb://localhost:27017/rocketsocket", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 
 io.on("connection", (socket) => {
   // Aqui o serviço é inicializado
-  console.log("socket", socket.id)
+  console.log("🔌 Nova conexão socket", socket.id)
 })
 
 app.use(express.static(path.join(__dirname,"..", "public")))
