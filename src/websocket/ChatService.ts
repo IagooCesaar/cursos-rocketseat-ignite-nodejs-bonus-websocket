@@ -54,6 +54,7 @@ io.on("connect", socket => {
         userLogged._id,
       ]);
     }
+    socket.join(room.idChatRoom)
     callback(room)
   })
 })
