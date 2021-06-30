@@ -5,6 +5,7 @@ import { CreateMessageService } from '../services/CreateMessageService'
 import { CreateUserService } from '../services/CreateUserService'
 import { GetAllUsersService } from '../services/GetAllUsersService'
 import { GetChatRoomByUsersService } from '../services/GetChatRoomByUsersService'
+import { GetMessagesByChatRoomIdService } from '../services/GetMessagesByChatRoomIdService'
 import { GetUserBySocketIdService } from '../services/GetUserBySocketIdService'
 
 // socket.emit() -> envio direcionado a um grupo de conexões
@@ -55,8 +56,11 @@ io.on("connect", socket => {
         userLogged._id,
       ]);
     }
+    const getMessagesByChatRoomIdService = container.resolve(GetMessagesByChatRoomIdService);
+    const messages = await getMessagesByChatRoomIdService.execute(room.idChatRoom);
+
     socket.join(room.idChatRoom)
-    callback({ room })
+    callback({ room, messages })
   })
 
   socket.on("message", async (data) => {
