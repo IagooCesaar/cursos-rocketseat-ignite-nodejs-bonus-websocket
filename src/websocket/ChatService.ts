@@ -1,6 +1,7 @@
 import { container } from 'tsyringe'
 import { io } from '../http'
 import { CreateUserService } from '../services/CreateUserService'
+import { GetAllUsersService } from '../services/GetAllUsersService'
 
 // socket.emit() -> envio direcionado a um grupo de conexões
 // socket.broadcast.emit() -> envia para todos os usuário, exceto para o próprio remetente
@@ -27,7 +28,10 @@ io.on("connect", socket => {
 
   })
 
-  socket.on("get_users", () => {
-
+  socket.on("get_users", async (callback) => {
+    // "get_users" é emitido pelo frontend para obter lista de usuário
+    const getAllUsersService = container.resolve(GetAllUsersService)
+    const users = await getAllUsersService.execute();
+    callback(users)
   })
 })
