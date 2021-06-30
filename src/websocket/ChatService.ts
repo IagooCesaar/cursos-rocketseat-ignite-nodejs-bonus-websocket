@@ -3,7 +3,8 @@ import { io } from '../http'
 import { CreateUserService } from '../services/CreateUserServices'
 
 // socket.emit() -> envio direcionado a um grupo de conexões
-// io.emit() -> broadcast
+// socket.broadcast.emit() -> envia para todos os usuário, exceto para o proprio remetente
+// io.emit() -> broadcast para todos usuários
 // socket.on() -> evento para "ouvir" 
 io.on("connect", socket => {
   // recuperando dados da conexão (evento "on connection")
@@ -17,6 +18,6 @@ io.on("connect", socket => {
       name,
       socket_id,
     })
-    console.log(user)
+    socket.broadcast.emit("new_users", user)
   })
 })
