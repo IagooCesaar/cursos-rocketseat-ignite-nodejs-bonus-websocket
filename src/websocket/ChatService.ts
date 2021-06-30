@@ -46,8 +46,8 @@ io.on("connect", socket => {
       idUser,
       userLogged._id,
     ]);
-    
-    if(!room) {      
+
+    if(!room) {
       const createChatRoomService = container.resolve(CreateChatRoomService);
       room = await createChatRoomService.execute([
         idUser,
