@@ -9,7 +9,7 @@ interface CreateUserDTO {
 }
 
 @injectable()
-class CreateUserUseService {
+class CreateUserService {
 
   async execute({
     avatar,
@@ -41,4 +41,4 @@ class CreateUserUseService {
   }
 }
 
-export { CreateUserUseService }
+export { CreateUserService }
