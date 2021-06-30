@@ -8,6 +8,7 @@ const server = createServer(app);
 const io = new Server(server);
 
 io.on("connection", (socket) => {
+  // Aqui o serviço é inicializado
   console.log("socket", socket.id)
 })
 
