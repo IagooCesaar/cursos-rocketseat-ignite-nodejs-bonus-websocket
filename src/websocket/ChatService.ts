@@ -1,7 +1,10 @@
 import { container } from 'tsyringe'
 import { io } from '../http'
+import { CreateChatRoomService } from '../services/CreateChatRoomService'
 import { CreateUserService } from '../services/CreateUserService'
 import { GetAllUsersService } from '../services/GetAllUsersService'
+import { GetChatRoomByUsersService } from '../services/GetChatRoomByUsersService'
+import { GetUserBySocketIdService } from '../services/GetUserBySocketIdService'
 
 // socket.emit() -> envio direcionado a um grupo de conexões
 // socket.broadcast.emit() -> envia para todos os usuário, exceto para o próprio remetente
@@ -24,8 +27,6 @@ io.on("connect", socket => {
     })
     //Enviando usuário para todos os outros conectados
     socket.broadcast.emit("new_users", user);
-
-
   })
 
   socket.on("get_users", async (callback) => {
@@ -33,5 +34,26 @@ io.on("connect", socket => {
     const getAllUsersService = container.resolve(GetAllUsersService)
     const users = await getAllUsersService.execute();
     callback(users)
+  })
+
+  socket.on("start_chat", async (data, callback) => {
+    const { idUser } = data;
+    const getUserBySocketIdService = container.resolve(GetUserBySocketIdService);
+    const userLogged = await getUserBySocketIdService.execute(socket.id);
+
+    const getChatRoomByUsersService = container.resolve(GetChatRoomByUsersService);
+    let room = await getChatRoomByUsersService.execute([
+      idUser,
+      userLogged._id,
+    ]);
+    
+    if(!room) {      
+      const createChatRoomService = container.resolve(CreateChatRoomService);
+      room = await createChatRoomService.execute([
+        idUser,
+        userLogged._id,
+      ]);
+    }
+    callback(room)
   })
 })
