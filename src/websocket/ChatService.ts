@@ -4,6 +4,7 @@ import { CreateChatRoomService } from '../services/CreateChatRoomService'
 import { CreateMessageService } from '../services/CreateMessageService'
 import { CreateUserService } from '../services/CreateUserService'
 import { GetAllUsersService } from '../services/GetAllUsersService'
+import { GetChatRoomByIdService } from '../services/GetChatRoomByIdService'
 import { GetChatRoomByUsersService } from '../services/GetChatRoomByUsersService'
 import { GetMessagesByChatRoomIdService } from '../services/GetMessagesByChatRoomIdService'
 import { GetUserBySocketIdService } from '../services/GetUserBySocketIdService'
@@ -80,5 +81,14 @@ io.on("connect", socket => {
       user: userLogged,
     })
 
+    //envia notificação para usuário destinatário    
+    const getChatRoomByIdService = container.resolve(GetChatRoomByIdService);
+    const room = await getChatRoomByIdService.execute(data.idChatRoom);
+    const recipientUser = room.idUsers.find(user => user.id !== userLogged.id);
+    io.to(recipientUser.socket_id).emit("notification", {
+      newMessage: true,
+      roomId: data.idChatRoom,
+      from: userLogged
+    })
   })
 })
