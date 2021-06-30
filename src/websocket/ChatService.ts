@@ -1,6 +1,7 @@
 import { container } from 'tsyringe'
 import { io } from '../http'
 import { CreateChatRoomService } from '../services/CreateChatRoomService'
+import { CreateMessageService } from '../services/CreateMessageService'
 import { CreateUserService } from '../services/CreateUserService'
 import { GetAllUsersService } from '../services/GetAllUsersService'
 import { GetChatRoomByUsersService } from '../services/GetChatRoomByUsersService'
@@ -8,8 +9,9 @@ import { GetUserBySocketIdService } from '../services/GetUserBySocketIdService'
 
 // socket.emit() -> envio direcionado a um grupo de conexões
 // socket.broadcast.emit() -> envia para todos os usuário, exceto para o próprio remetente
-// io.emit() -> broadcast para todos usuários
 // socket.on() -> evento para "ouvir" 
+// io.emit() -> broadcast para todos usuários
+// io.to() -> envio para um socket id específico
 
 io.on("connect", socket => {
   // recuperando dados da conexão (evento "on connection")
@@ -56,5 +58,23 @@ io.on("connect", socket => {
     }
     socket.join(room.idChatRoom)
     callback(room)
+  })
+
+  socket.on("message", async (data) => {
+    const getUserBySocketIdService = container.resolve(GetUserBySocketIdService);
+    const userLogged = await getUserBySocketIdService.execute(socket.id);
+
+    const createMessageService = container.resolve(CreateMessageService);
+    const message = await createMessageService.execute({
+      to: userLogged._id,
+      roomId: data.idChatRoom,
+      text: data.message
+    })
+
+    io.to(data.idChatRoom).emit("message", {
+      message,
+      user: userLogged,
+    })
+
   })
 })
