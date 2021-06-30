@@ -48,7 +48,6 @@ io.on("connect", socket => {
       idUser,
       userLogged._id,
     ]);
-
     if(!room) {
       const createChatRoomService = container.resolve(CreateChatRoomService);
       room = await createChatRoomService.execute([
@@ -57,7 +56,7 @@ io.on("connect", socket => {
       ]);
     }
     socket.join(room.idChatRoom)
-    callback(room)
+    callback({ room })
   })
 
   socket.on("message", async (data) => {
@@ -71,6 +70,7 @@ io.on("connect", socket => {
       text: data.message
     })
 
+    //envia mensagem para todos os membros da sala
     io.to(data.idChatRoom).emit("message", {
       message,
       user: userLogged,
